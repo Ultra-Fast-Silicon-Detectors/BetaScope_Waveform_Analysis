@@ -461,7 +461,7 @@ class Lgad(cmd.Cmd, object):
 
         mode = i_mode.split(" ")
 
-        #self.do_download_latest_UDI()
+        self.do_download_latest_UDI()
 
         if "dry" in mode[0]:
             colorString.sysMsg(f"dry run. mode:")
