@@ -332,7 +332,7 @@ bool BetaScopeWaveformAna::Initialize()
       std::cout << this->i_w[ch] << std::endl;
       std::cout << this->beta_scope.GetInBranch<TTreeReaderArray, double>("w" + std::to_string(ch)) << std::endl;
     }
-  }
+  } 
 
   if( beta_scope.IsBranchExists("ievent") )
   {
