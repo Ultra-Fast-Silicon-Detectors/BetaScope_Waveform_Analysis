@@ -22,16 +22,20 @@ void runAna(std::string fileName) {
 }
 
 int main(int argc, char **argv) {
+
   ROOT::EnableThreadSafety();
   TThread::IsInitialized();
   ROOT::EnableImplicitMT(16);
 
+  std::cout<<argc<<" "<<argv[1]<<std::endl;
+
   if (argc < 2) {
-    runAna(argv[1]);
+    runAna(std::string(argv[1]));
     return 0;
   }
 
-  auto files = BetaScope_Utilities::Dir::getFiles(argv[1], argv[2]);
+  // Get files in directory with pattern
+  auto files = BetaScope_Utilities::Dir::getFiles(std::string(argv[1]), std::string(argv[2]));
   for (auto f : files) {
     runAna(f);
   }
