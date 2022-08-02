@@ -20,13 +20,13 @@ void loopHelper(WaveformAnalysis *WaveAna, std::vector<double> *w,
                 std::vector<double> *tmax, std::vector<int> *max_indexing,
                 std::vector<double> *negPmax, std::vector<double> *negTmax,
                 std::vector<double> *pulseArea, double assistThreshold) {
-  
+
   WaveAna->Correct_Baseline2(*w, 0.30);
 
   WaveAna->Get_PmaxTmax_Of_Multiple_Singal(assistThreshold, *w, *t, *pmax,
                                            *tmax, *max_indexing, 1.0);
 
-  // convert ADC to mV
+  // convert ADC to mV 
   for (std::size_t j = 0, max = w->size(); j < max; j++) w->at(j) = w->at(j)*0.2441;
 
 
@@ -344,4 +344,3 @@ void PSIAna::Finalize() {
     beta_scope.GetOutFile()->cd();
     PSIAna::_Finalize();
 }
-

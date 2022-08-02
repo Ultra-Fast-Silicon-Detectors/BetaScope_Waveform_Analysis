@@ -23,11 +23,11 @@ void runAna(std::string fileName) {
 
 int main(int argc, char **argv) {
 
+  std::cout<<argc<<" "<<argv[1]<<std::endl;
+
   ROOT::EnableThreadSafety();
   TThread::IsInitialized();
   ROOT::EnableImplicitMT(16);
-
-  std::cout<<argc<<" "<<argv[1]<<std::endl;
 
   if (argc < 2) {
     runAna(std::string(argv[1]));
