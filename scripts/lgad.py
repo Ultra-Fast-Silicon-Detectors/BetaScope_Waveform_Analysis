@@ -139,6 +139,7 @@ class Lgad(cmd.Cmd, object):
     def do_unpack(self, tdir=""):
         "unpack segmented data"
         self.do_cd(f"{self.my_raw_dir}{self.runNum_dir}/fromDAQ/")
+        #subprocess.call("/home/datataking/DAQForProduction/utility/unpack.sh")
         if not os.path.isdir("raw"):
             os.mkdir("raw")
             os.system("mv *.root* raw/")
@@ -457,11 +458,11 @@ class Lgad(cmd.Cmd, object):
         )
 
     def do_run_analysis(self, i_mode):
-        "Run routine beta-scope analysis. Argument with 'full' will do the full rountine analysis, else it will only generate stats files. Argument 'resonly' will only run the result calculation. Argument with 'nohup' will supress the output "
+        "Run routine beta-scope analysis. Argument with 'full' will do the full rountine analysis, else it will only generate stats files. Argument 'res_only' will only run the result calculation after auto cut. Argument 'get_res' will get the result without runnin the auto cut script again (use this to resolve tmax/pmax issues). Argument with 'nohup' will supress the output "
 
         mode = i_mode.split(" ")
 
-        #self.do_download_latest_UDI()
+        self.do_download_latest_UDI()
 
         if "dry" in mode[0]:
             colorString.sysMsg(f"dry run. mode:")
@@ -522,6 +523,7 @@ class Lgad(cmd.Cmd, object):
                     shell=True,
                 )
                 p.wait()
+                self.do_plot_run(self.runNum)
 
             elif "full" in mode[0]:
                 p = subprocess.Popen(

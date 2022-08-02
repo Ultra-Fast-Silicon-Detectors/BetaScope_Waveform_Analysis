@@ -1,30 +1,38 @@
+#ifndef PSI_ANA
+#define PSI_ANA
+
 #include "BetaScope_Driver/include/BetaScopeExt_Class.h"
 #include "BetaScope_Driver/include/BetaScopeExt_Templates.tpp"
 #include "BetaScope_Driver/include/BetaScope_AnaFramework.h"
-#include "BetaScope_Driver/include/BetaScope_Class.h"
 #include <iostream>
 #include <string>
 
-class ArgoneXrayAna : public BetaScope_AnaFramework<BetaScope_Ext> {
+class PSIAna : public BetaScope_AnaFramework<BetaScope_Ext> {
+public:
   std::string ifile;
 
-public:
-  ArgoneXrayAna(std::string ifile) {
-    std::cout << "Using user template: "
-              << "ArgoneXrayAna" << std::endl;
-    this->ifile = ifile;
+  PSIAna(){};
+
+  PSIAna(std::string ifile){
+    std::cout << "Using user template: "<< "PSIAna" << std::endl;
     std::cout << "on file: " << ifile << std::endl;
+    this->ifile = ifile;
   };
-  ~ArgoneXrayAna(){};
+
+  ~PSIAna(){};
+
 
   // required, user can add more to the existing methods;
   void Initialize();
+  void Analysis(){};
   void LoopEvents();
-  void Finalize() {
-    beta_scope.GetOutFile()->cd();
-    ArgoneXrayAna::_Finalize();
-  };
+  void Finalize();
   void _Finalize();
+  void run() {
+    Initialize();
+    LoopEvents();
+    Finalize();
+  };
 
   std::vector<double> *w[16];
   std::vector<double> *t;
@@ -46,4 +54,11 @@ public:
   // TTreeReaderArray<i_type> *input_v);
 };
 
+//PSIAna::PSIAna(std::string ifile){this->ifile = ifile;};
+
+//PSIAna::PSIAna(){};
+//PSIAna::~PSIAna(){};
+
 int RunAnalysis(std::string ifile);
+
+#endif //PSI_ANA

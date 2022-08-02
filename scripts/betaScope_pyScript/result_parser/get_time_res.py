@@ -133,6 +133,8 @@ def Get_Time_Resolution(
     else:
         trig_cali_run = sorted(list(TRIG_CALI.keys()))
         use_cali_run = None
+        if run_number==None or run_number=="Run_Number_NA": run_number = 0
+        print (trig_cali_run, run_number)
         for i in range(len(trig_cali_run)):
             try:
                 if trig_cali_run[i] <= run_number:
