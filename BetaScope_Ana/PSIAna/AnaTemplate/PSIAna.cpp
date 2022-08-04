@@ -21,8 +21,9 @@ void loopHelper(WaveformAnalysis *WaveAna, std::vector<double> *w,
                 std::vector<double> *negPmax, std::vector<double> *negTmax,
                 std::vector<double> *pulseArea, double assistThreshold) {
   WaveAna->Correct_Baseline2(*w, 0.30);
-  WaveAna->Get_PmaxTmax_Of_Multiple_Singal(assistThreshold, *w, *t, *pmax,
-                                           *tmax, *max_indexing, 1.0);
+
+  WaveAna->Find_Singal_Maxiumum(*w, *t, 0, 0);
+
   for (std::size_t vSize = 0, maxSize = pmax->size(); vSize < maxSize;
        vSize++) {
     std::pair<double, unsigned int> my_pmax =
