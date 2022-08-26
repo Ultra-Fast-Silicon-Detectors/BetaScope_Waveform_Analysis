@@ -21,8 +21,8 @@ void loopHelper(WaveformAnalysis *WaveAna, std::vector<double> *w,
                 std::vector<double> *negPmax, std::vector<double> *negTmax,
                 std::vector<double> *pulseArea, double assistThreshold) {
   WaveAna->Correct_Baseline2(*w, 0.30);
-
-  WaveAna->Find_Singal_Maxiumum(*w, *t, 0, 0);
+  //WaveAna->Get_PmaxTmax_Of_Multiple_Singal(assistThreshold, *w, *t, *pmax, *tmax, *max_indexing, 1.0);
+  WaveAna->Find_Singal_Maximum(*w, *t, 0, 0);
 
   for (std::size_t vSize = 0, maxSize = pmax->size(); vSize < maxSize;
        vSize++) {
@@ -63,9 +63,9 @@ void PSIAna::Initialize() {
     w[ch] = this->beta_scope.GetOutBranch<std::vector<double>>(Form("w%i", ch));
 
     if (ch == 0) {
-      br_check = this->beta_scope.SetInBranch<TTreeReaderArray, double>("t", "t");
-      br_check = this->beta_scope.BuildOutBranch<std::vector<double>>("t");
-      t = this->beta_scope.GetOutBranch<std::vector<double>>("t");
+      br_check = this->beta_scope.SetInBranch<TTreeReaderArray, double>("time", "time");
+      br_check = this->beta_scope.BuildOutBranch<std::vector<double>>("time");
+      t = this->beta_scope.GetOutBranch<std::vector<double>>("time");
     }
   }
 
@@ -98,17 +98,17 @@ void PSIAna::Initialize() {
   }
   */
 
-  for (int i = 0; i < 16; i++) {
-    auto br_check = this->beta_scope.BuildBranch<std::vector<double>>(Form("pmax%i", i));
-    br_check = this->beta_scope.BuildOutBranch<std::vector<double>>(Form("tmax%i", i));
-    br_check = this->beta_scope.BuildOutBranch<std::vector<int>>(
-        Form("max_indexing%i", i));
-    br_check = this->beta_scope.BuildOutBranch<std::vector<double>>(
-        Form("pulseArea%i", i));
-    br_check = this->beta_scope.BuildOutBranch<std::vector<double>>(
-        Form("negPmax%i", i));
-    br_check = this->beta_scope.BuildOutBranch<std::vector<double>>(
-        Form("negTmax%i", i));
+//  for (int i = 0; i < 16; i++) {
+//    auto br_check = this->beta_scope.BuildBranch<std::vector<double>>(Form("pmax%i", i));
+//    br_check = this->beta_scope.BuildOutBranch<std::vector<double>>(Form("tmax%i", i));
+//    br_check = this->beta_scope.BuildOutBranch<std::vector<int>>(
+//        Form("max_indexing%i", i));
+//    br_check = this->beta_scope.BuildOutBranch<std::vector<double>>(
+//        Form("pulseArea%i", i));
+//    br_check = this->beta_scope.BuildOutBranch<std::vector<double>>(
+//        Form("negPmax%i", i));
+//    br_check = this->beta_scope.BuildOutBranch<std::vector<double>>(
+//        Form("negTmax%i", i));
 
     this->pmax[i] =
         this->beta_scope.GetOutBranch<std::vector<double>>(Form("pmax%i", i));
@@ -124,15 +124,15 @@ void PSIAna::Initialize() {
         Form("negTmax%i", i));
   }
 
-  auto br_check = this->beta_scope.BuildOutBranch<int>("counter");
+  //auto br_check = this->beta_scope.BuildOutBranch<int>("counter");
 
-  this->beta_scope.BuildTH1Branch<TH1D>("counter_histo");
+  //this->beta_scope.BuildTH1Branch<TH1D>("counter_histo");
 
-  this->beta_scope.BuildTH1Branch<TH1D>("counter");
-  this->beta_scope.BuildTH1Branch<TH2D>("counter2D");
+  //this->beta_scope.BuildTH1Branch<TH1D>("counter");
+  //this->beta_scope.BuildTH1Branch<TH2D>("counter2D");
 
-  this->standAloneHisto_ptr =
-      new TH1D("standAloneHisto_ptr", "standAloneHisto_ptr", 100, 1, 1);
+  //this->standAloneHisto_ptr =
+  //    new TH1D("standAloneHisto_ptr", "standAloneHisto_ptr", 100, 1, 1);
 }
 
 //==============================================================================
@@ -204,7 +204,7 @@ void PSIAna::LoopEvents() {
           this->beta_scope.GetInBranch<TTreeReaderArray, double>("w15")->At(i) *
           verScaler);
       t->push_back(
-          this->beta_scope.GetInBranch<TTreeReaderArray, double>("t")->At(i) *
+          this->beta_scope.GetInBranch<TTreeReaderArray, double>("time")->At(i) *
           horiScaler);
     }
     //*/
@@ -296,24 +296,24 @@ void PSIAna::LoopEvents() {
     // t->push_back( this->beta_scope.iTreeDoubleArrayMap["t"]->At(i) *
     // horiScaler );
 
-    TH1D tmp(Form("tmp%i", count), "", 100, 1, 1);
-    tmp.Fill(count);
-    *this->beta_scope.GetOutTH1<TH1D>("counter_histo") = tmp;
+    //TH1D tmp(Form("tmp%i", count), "", 100, 1, 1);
+    //tmp.Fill(count);
+    //*this->beta_scope.GetOutTH1<TH1D>("counter_histo") = tmp;
 
-    TH1D tmp2(Form("tmp2%i", count), "", 100, 1, 1);
-    tmp2.Fill(count);
+    //TH1D tmp2(Form("tmp2%i", count), "", 100, 1, 1);
+    //tmp2.Fill(count);
     //*static_cast<TH1_Container<TH1D>*>(this->beta_scope.oTree_TH1_Map["counter"])->get()
     //= tmp2;
-    *this->beta_scope.GetOutTH1<TH1D>("counter") = tmp2;
+    //*this->beta_scope.GetOutTH1<TH1D>("counter") = tmp2;
 
-    TH2D tmp3(Form("tmp3%i", count), "", 100, 0, 5000, 100, 0, 5000);
-    tmp3.Fill(count, count);
-    *this->beta_scope.GetOutTH1<TH2D>("counter2D") = tmp3;
+    //TH2D tmp3(Form("tmp3%i", count), "", 100, 0, 5000, 100, 0, 5000);
+    //tmp3.Fill(count, count);
+    //*this->beta_scope.GetOutTH1<TH2D>("counter2D") = tmp3;
 
-    this->standAloneHisto.Fill(count * 2.0);
-    this->standAloneHisto_ptr->Fill(count * 2.0);
+    //this->standAloneHisto.Fill(count * 2.0);
+    //this->standAloneHisto_ptr->Fill(count * 2.0);
 
-    *this->beta_scope.GetOutBranch<int>("counter") = count;
+    //*this->beta_scope.GetOutBranch<int>("counter") = count;
     count++;
 
     BetaScope_AnaFramework::FillData();
@@ -328,8 +328,8 @@ void PSIAna::LoopEvents() {
 
 void PSIAna::_Finalize() {
   // do your own stuffs here
-  this->standAloneHisto.Write();
-  this->standAloneHisto_ptr->Write();
+  //this->standAloneHisto.Write();
+  //this->standAloneHisto_ptr->Write();
 
   BetaScope_AnaFramework::Finalize();
 }
@@ -338,4 +338,3 @@ void PSIAna::Finalize() {
     beta_scope.GetOutFile()->cd();
     PSIAna::_Finalize();
 }
-

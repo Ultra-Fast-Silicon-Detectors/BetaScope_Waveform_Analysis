@@ -46,8 +46,8 @@ public:
   std::vector<double> *negTmax[16];
 
   // example of filling standalone histograms
-  TH1D standAloneHisto = TH1D("standAloneHisto", "standAloneHisto", 100, 1, 1);
-  TH1D *standAloneHisto_ptr = 0;
+  //TH1D standAloneHisto = TH1D("standAloneHisto", "standAloneHisto", 100, 1, 1);
+  //TH1D *standAloneHisto_ptr = 0;
 
   // template <typename o_type, typename i_type>
   // void copyTTreeReaderArrayToVector( o_type *output_v,
