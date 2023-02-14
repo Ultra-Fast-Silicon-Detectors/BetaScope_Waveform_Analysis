@@ -108,7 +108,7 @@ public:
     //==========================================================================
     // Pulse Maximum (Pmax)
     std::pair<double, unsigned int>
-    static Find_Singal_Maximum(
+    static Find_Signal_Maximum(
         const std::vector<double> &voltageVec,
         const std::vector<double> &timeVec,
         const bool &confineSearchRegion,

@@ -34,7 +34,7 @@ Finding the Signal Maximum (Pmax)
   return : Pmax value and its index in the waveform vector.
 ==============================================================================*/
 std::pair<double, unsigned int>
-WaveformAnalysis::Find_Singal_Maximum(
+WaveformAnalysis::Find_Signal_Maximum(
     const std::vector<double> &voltageVec,
     const std::vector<double> &timeVec,
     const bool &confineSearchRegion,

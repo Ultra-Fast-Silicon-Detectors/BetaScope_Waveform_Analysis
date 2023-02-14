@@ -53,7 +53,7 @@ WaveformAna<double, double> WaveformAnalysis::analyze_waveform(
     std::vector<double> back_temp_voltage = *w;
     std::vector<double> back_temp_time = *t;
 
-    std::pair<double, unsigned int> pmax_before_baseline = WaveformAnalysis::Find_Singal_Maximum( *w, *t, limiting_search_region_OnOff, pmaxSearchRange);
+    std::pair<double, unsigned int> pmax_before_baseline = WaveformAnalysis::Find_Signal_Maximum( *w, *t, limiting_search_region_OnOff, pmaxSearchRange);
     double tmax_for_baseline = t->at( pmax_before_baseline.second);
     double temp_riseTime = WaveformAnalysis::Find_Rise_Time(*w, *t, pmax_before_baseline, 0.1, 0.9);
 
@@ -63,12 +63,12 @@ WaveformAna<double, double> WaveformAnalysis::analyze_waveform(
     };
 
     std::pair<double, unsigned int>
-    front_baseline_pmax = WaveformAnalysis::Find_Singal_Maximum(*w, *t, true, temp_front_searchRange);
+    front_baseline_pmax = WaveformAnalysis::Find_Signal_Maximum(*w, *t, true, temp_front_searchRange);
     double front_baseline_tmax = t->at(front_baseline_pmax.second);
     double front_baseline_riseTime = WaveformAnalysis::Find_Rise_Time(*w, *t, front_baseline_pmax, 0.1, 0.9);
     double temp_baselineRange[2] = {front_baseline_tmax - front_baseline_riseTime - 5000.0, front_baseline_tmax + 5000.0 };
     WaveformAnalysis::Correct_Baseline3( front_temp_voltage, front_temp_time, temp_baselineRange);
-    std::pair<double, unsigned int> front_baseline_pmax_corr = WaveformAnalysis::Find_Singal_Maximum( front_temp_voltage, front_temp_time,true, temp_front_searchRange);
+    std::pair<double, unsigned int> front_baseline_pmax_corr = WaveformAnalysis::Find_Signal_Maximum( front_temp_voltage, front_temp_time,true, temp_front_searchRange);
     waveform.front_baseline_int( WaveformAnalysis::Pulse_Integration_with_Fixed_Window_Size( front_temp_voltage, front_temp_time,front_baseline_pmax_corr, "Simpson", 1000.0, 3000.0));
 
     double temp_back_searchRange[2] = {
@@ -76,12 +76,12 @@ WaveformAna<double, double> WaveformAnalysis::analyze_waveform(
       tmax_for_baseline + 15000.0
     };
 
-    std::pair<double, unsigned int> back_baseline_pmax = WaveformAnalysis::Find_Singal_Maximum(*w, *t, true, temp_back_searchRange);
+    std::pair<double, unsigned int> back_baseline_pmax = WaveformAnalysis::Find_Signal_Maximum(*w, *t, true, temp_back_searchRange);
     double back_baseline_tmax = t->at( back_baseline_pmax.second);
     double back_baseline_riseTime = WaveformAnalysis::Find_Rise_Time(*w, *t, back_baseline_pmax, 0.1, 0.9);
     double temp_back_baselineRange[2] = {back_baseline_tmax - back_baseline_riseTime - 5000.0, back_baseline_tmax + 5000.0};
     WaveformAnalysis::Correct_Baseline3( back_temp_voltage, back_temp_time, temp_back_baselineRange);
-    std::pair<double, unsigned int> back_baseline_pmax_corr = WaveformAnalysis::Find_Singal_Maximum(back_temp_voltage, back_temp_time, true, temp_back_searchRange);
+    std::pair<double, unsigned int> back_baseline_pmax_corr = WaveformAnalysis::Find_Signal_Maximum(back_temp_voltage, back_temp_time, true, temp_back_searchRange);
     waveform.back_baseline_int( WaveformAnalysis::Pulse_Integration_with_Fixed_Window_Size( back_temp_voltage, back_temp_time, back_baseline_pmax_corr, "Simpson",1000.0, 3000.0));
 
     double baselineRange[2] = {
@@ -97,7 +97,7 @@ WaveformAna<double, double> WaveformAnalysis::analyze_waveform(
     // )this->my_anaParam.limiting_search_region_OnOff=false; else
     // this->my_anaParam.limiting_search_region_OnOff = true;
 
-    std::pair<double, unsigned int> pmaxHolder = WaveformAnalysis::Find_Singal_Maximum( waveform.get_v2(), waveform.get_v1(), limiting_search_region_OnOff, pmaxSearchRange);
+    std::pair<double, unsigned int> pmaxHolder = WaveformAnalysis::Find_Signal_Maximum( waveform.get_v2(), waveform.get_v1(), limiting_search_region_OnOff, pmaxSearchRange);
     std::pair<double, unsigned int> neg_pmaxHolder = WaveformAnalysis::Find_Negative_Signal_Maximum( waveform.get_v2(), waveform.get_v1(), limiting_search_region_OnOff, pmaxSearchRange);
 
     waveform.pmax(pmaxHolder.first);
@@ -206,7 +206,7 @@ WaveformAna<double, double> WaveformAnalysis::analyze_waveform(
     std::vector<double> back_temp_voltage = waveform.v2();
     std::vector<double> back_temp_time = waveform.v1();
 
-    std::pair<double, unsigned int> pmax_before_baseline = WaveformAnalysis::Find_Singal_Maximum( waveform.get_v2(), waveform.get_v1(), limiting_search_region_OnOff, pmaxSearchRange);
+    std::pair<double, unsigned int> pmax_before_baseline = WaveformAnalysis::Find_Signal_Maximum( waveform.get_v2(), waveform.get_v1(), limiting_search_region_OnOff, pmaxSearchRange);
     double tmax_for_baseline;
     if( pmax_before_baseline.second < waveform.size() )
     {
@@ -225,12 +225,12 @@ WaveformAna<double, double> WaveformAnalysis::analyze_waveform(
     };
 
     std::pair<double, unsigned int>
-    front_baseline_pmax = WaveformAnalysis::Find_Singal_Maximum( waveform.get_v2(), waveform.get_v1(), true, temp_front_searchRange);
+    front_baseline_pmax = WaveformAnalysis::Find_Signal_Maximum( waveform.get_v2(), waveform.get_v1(), true, temp_front_searchRange);
     double front_baseline_tmax = waveform.get_v1_value(front_baseline_pmax.second);
     double front_baseline_riseTime = WaveformAnalysis::Find_Rise_Time( waveform.get_v2(), waveform.get_v1(), front_baseline_pmax, 0.1, 0.9);
     double temp_baselineRange[2] = {front_baseline_tmax - front_baseline_riseTime - 5000.0, front_baseline_tmax + 5000.0 };
     WaveformAnalysis::Correct_Baseline3( front_temp_voltage, front_temp_time, temp_baselineRange);
-    std::pair<double, unsigned int> front_baseline_pmax_corr = WaveformAnalysis::Find_Singal_Maximum( front_temp_voltage, front_temp_time,true, temp_front_searchRange);
+    std::pair<double, unsigned int> front_baseline_pmax_corr = WaveformAnalysis::Find_Signal_Maximum( front_temp_voltage, front_temp_time,true, temp_front_searchRange);
     waveform.front_baseline_int( WaveformAnalysis::Pulse_Integration_with_Fixed_Window_Size( front_temp_voltage, front_temp_time,front_baseline_pmax_corr, "Simpson", 1000.0, 3000.0));
 
     double temp_back_searchRange[2] = {
@@ -238,12 +238,12 @@ WaveformAna<double, double> WaveformAnalysis::analyze_waveform(
       tmax_for_baseline + 15000.0
     };
 
-    std::pair<double, unsigned int> back_baseline_pmax = WaveformAnalysis::Find_Singal_Maximum( waveform.get_v2(), waveform.get_v1(), true, temp_back_searchRange);
+    std::pair<double, unsigned int> back_baseline_pmax = WaveformAnalysis::Find_Signal_Maximum( waveform.get_v2(), waveform.get_v1(), true, temp_back_searchRange);
     double back_baseline_tmax = waveform.get_v1_value(back_baseline_pmax.second);
     double back_baseline_riseTime = WaveformAnalysis::Find_Rise_Time( waveform.get_v2(), waveform.get_v1(), back_baseline_pmax, 0.1, 0.9);
     double temp_back_baselineRange[2] = {back_baseline_tmax - back_baseline_riseTime - 5000.0, back_baseline_tmax + 5000.0};
     WaveformAnalysis::Correct_Baseline3( back_temp_voltage, back_temp_time, temp_back_baselineRange);
-    std::pair<double, unsigned int> back_baseline_pmax_corr = WaveformAnalysis::Find_Singal_Maximum(back_temp_voltage, back_temp_time, true, temp_back_searchRange);
+    std::pair<double, unsigned int> back_baseline_pmax_corr = WaveformAnalysis::Find_Signal_Maximum(back_temp_voltage, back_temp_time, true, temp_back_searchRange);
     waveform.back_baseline_int( WaveformAnalysis::Pulse_Integration_with_Fixed_Window_Size( back_temp_voltage, back_temp_time, back_baseline_pmax_corr, "Simpson",1000.0, 3000.0));
 
     double baselineRange[2] = {
@@ -264,7 +264,7 @@ WaveformAna<double, double> WaveformAnalysis::analyze_waveform(
     // )this->my_anaParam.limiting_search_region_OnOff=false; else
     // this->my_anaParam.limiting_search_region_OnOff = true;
 
-    std::pair<double, unsigned int> pmaxHolder = WaveformAnalysis::Find_Singal_Maximum( waveform.get_v2(), waveform.get_v1(), limiting_search_region_OnOff, pmaxSearchRange);
+    std::pair<double, unsigned int> pmaxHolder = WaveformAnalysis::Find_Signal_Maximum( waveform.get_v2(), waveform.get_v1(), limiting_search_region_OnOff, pmaxSearchRange);
     std::pair<double, unsigned int> neg_pmaxHolder = WaveformAnalysis::Find_Negative_Signal_Maximum( waveform.get_v2(), waveform.get_v1(), limiting_search_region_OnOff, pmaxSearchRange);
 
     waveform.pmax( pmaxHolder.first);

@@ -26,9 +26,8 @@ WaveformAnalysis::FitResult WaveformAnalysis::Fit_CFD(
   double range[2] = {-1000, 1000};
   if( waveform.pmax() < 0 )
   {
-    WaveformAnalysis::Find_Singal_Maximum(
-      waveform.get_v2(), waveform.get_v1(), false, range
-    );
+    WaveformAnalysis::Find_Signal_Maximum(
+      waveform.get_v2(), waveform.get_v1(), false, range);
   }
 
   double value_at_cfd = waveform.pmax()*cfd;
