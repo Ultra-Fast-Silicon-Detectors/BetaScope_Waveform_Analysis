@@ -17,7 +17,6 @@
 void loopHelper(WaveformAnalysis *WaveAna, std::vector<double>  *w, std::vector<double> *t, double *pmax, double *pmaxGlobal, double *tmax, double *tmax_ps, double *tmaxGlobal, double *tmaxGlobal_ps, int *max_indexing, int *max_indexing_global, double *negPmax, double *negTmax, double *negTmax_ps, double *pulseArea, double assistThreshold, std::string run_number, int channel) {
   WaveAna->Correct_Baseline2(*w, 0.30);
 
-<<<<<<< HEAD
   std::string fname("/home/psi_tb/Desktop/HGTD_BetaScope_FW_Test/BetaScope_Ana/PSIAna/AnaTemplate/test.csv");
   csv_run_reader run_map(fname);
 
