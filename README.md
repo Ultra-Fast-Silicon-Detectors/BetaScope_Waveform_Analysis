@@ -9,6 +9,25 @@ To begin:
 
 Tested with ROOT-6.18
 
+
+## For CENPA Analysis
+Main functions and analysis are in /BetaScope_Ana/CENPAAna
+
+To find the main executable code this is inside BetaScope_Ana/CENPAAna/main
+To find the code that is looping over each event find this inside BetaScope_Ana/CENPAAna/AnaTemplate 
+Lastly, to find the code that creates different statistics (for example pmax) all of these functions are located in General/WaveformAna with the main definitions in src
+
+To run this code: 
+   cd scrips/
+   source setup.sh
+
+   cd BetaScope_Ana/CENPAAna/bin 
+   ./CENPATest <directory in which root file you want analyzed lives> <root file>
+
+Can also analyze multiple files by doing 
+   ./CENPATest <directory in which root file(s) you want analyzed lives> *.root
+
+
 ## Usage
 
 ### LGAD Interface.
