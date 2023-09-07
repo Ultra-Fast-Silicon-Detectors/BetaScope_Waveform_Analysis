@@ -95,6 +95,40 @@ double WaveformAnalysis::Correct_Baseline2(
 
 /*==============================================================================
 Alternate implementation of baseline correction.(2)
+Overloaded to work with Floats
+
+  std::vector<float>& voltageVec := (stl) vector contains the voltage.
+  double fractional_pts := using fraction of the points for baseline correction.
+
+  return: None.
+==============================================================================*/
+float WaveformAnalysis::Correct_Baseline2(
+    std::vector<float> &voltageVec,
+    const float &fractional_pts
+)
+{
+    float mean = 0;
+
+    int noise_pts = fractional_pts *
+                    voltageVec.size();
+
+    for (std::size_t j = 0, max = noise_pts; j < max; j++)
+    {
+        mean += voltageVec.at(j);
+    }
+
+    mean = mean / noise_pts;
+
+    for (std::size_t j = 0, max = voltageVec.size(); j < max; j++)
+    {
+        voltageVec.at(j) = voltageVec.at(j) - mean;
+    }
+
+    return mean;
+}
+
+/*==============================================================================
+Alternate implementation of baseline correction.(2)
 
   std::vector<double>& voltageVec := (stl) vector contains the voltage.
   double fractional_pts := using fraction of the points for baseline correction.

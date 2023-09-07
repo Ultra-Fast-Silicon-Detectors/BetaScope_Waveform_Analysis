@@ -5,6 +5,7 @@ make:
 	make -j -C FASTWaveformAna/
 	#make -j -C ArgoneXrayAna/
 	make -j -C PSIAna/
+	make -j -C CENPAAna/
 
 .PHONY: clean
 clean:
@@ -13,3 +14,4 @@ clean:
 	make clean -C FASTWaveformAna/
 	make clean -C ArgoneXrayAna/
 	make clean -C PSIAna/
+	make clean -C CENPAAna/

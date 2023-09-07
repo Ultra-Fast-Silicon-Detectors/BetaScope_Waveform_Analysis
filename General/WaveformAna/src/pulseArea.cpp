@@ -89,6 +89,63 @@ WaveformAnalysis::Find_Pulse_Area(
 }
 
 /*==============================================================================
+Finding the pulse area of a signal. Stop when it crosses zero (legacy)
+  std::vector<float> voltageVec := waveform
+  std::vector<float> timeVec := time trace of the waveform
+  const std::pair<float,unsigned int> Pmax := tuple that contains pmax and its
+index
+
+  return: (float) value of the pulse area
+  overloaded function to deal with floats
+==============================================================================*/
+float
+WaveformAnalysis::Find_Pulse_Area(
+    const std::vector<float> &voltageVec,
+    const std::vector<float> &timeVec,
+    const std::pair<float, unsigned int> &Pmax
+)
+{
+    float pulse_area = 0.0;
+    const float time_difference = timeVec.at(1) - timeVec.at(0);
+
+    const unsigned int imax = Pmax.second;
+    unsigned int istart = 0;
+    unsigned int iend;
+    std::size_t npoints = voltageVec.size();
+
+    for (int j = imax; j > -1; j--)   // find index of start of pulse
+    {
+        if (voltageVec.at(j) <= 0)   // stop after crossing zero
+        {
+            istart = j;
+            break;
+        }
+    }
+    for (unsigned int j = imax; j < npoints; j++)   // find index of end of pulse
+    {
+        if (voltageVec.at(j) <= 0)
+        {
+            iend = j;
+            break;
+        }
+        if (j == npoints - 1)
+        {
+            iend = j;
+        }
+    }
+
+    for (unsigned int j = istart; j < iend; j++)
+    {
+        pulse_area = pulse_area + voltageVec.at(j) / 1000.0;
+    }
+
+    pulse_area = pulse_area * time_difference /1.0E12;
+
+    return pulse_area; // collected pulse area, assuming voltage is in volts, time
+    // is in seconds
+}
+
+/*==============================================================================
 double
   WaveformAnalysis::Find_Pulse_Area
 
@@ -166,6 +223,83 @@ WaveformAnalysis::Find_Pulse_Area(
 }
 
 /*==============================================================================
+float
+  WaveformAnalysis::Find_Pulse_Area
+
+  usage: Wrapper of WaveformAnalysis::Find_Pulse_Area.
+  added a artificial_baseline parameter for manual lifting the baseline.
+  The default value is 0.
+
+  std::vector<float>
+    voltageVec := voltage vector
+
+  std::vector<float>
+    timeVec := time vector
+
+  const std::pair<float,unsigned int>
+    Pmax := pmax value and it's index, stored as pair
+
+  const float
+    artificial_baseline = 0.0 := for manually redefine the zero-crossing when
+  calculting the pulse area.
+
+  return : pulse area
+  
+  This is an overloaded function to deal with floats
+  comments: this function should be merged with the previous one
+==============================================================================*/
+float
+WaveformAnalysis::Find_Pulse_Area(
+    const std::vector<float> &voltageVec,
+    const std::vector<float> &timeVec,
+    const std::pair<float, unsigned int> &Pmax,
+    const float &artificial_baseline)
+{
+    if (artificial_baseline == 0.0)
+    {
+        return WaveformAnalysis::Find_Pulse_Area(voltageVec, timeVec, Pmax);
+    }
+
+    float pulse_area = 0.0;
+    const float time_difference = timeVec.at(1) - timeVec.at(0);
+
+    const unsigned int imax = Pmax.second;
+    unsigned int istart = 0;
+    unsigned int iend;
+    std::size_t npoints = voltageVec.size();
+
+    for (int j = imax; j > -1; j--)   // find index of start of pulse
+    {
+        if (voltageVec.at(j) <= artificial_baseline)   // stop after crossing zero
+        {
+            istart = j;
+            break;
+        }
+    }
+    for (unsigned int j = imax; j < npoints; j++)   // find index of end of pulse
+    {
+        if (voltageVec.at(j) <= artificial_baseline)
+        {
+            iend = j;
+            break;
+        }
+        if (j == npoints - 1)
+        {
+            iend = j;
+        }
+    }
+
+    for (unsigned int j = istart; j < iend; j++)
+    {
+        pulse_area = pulse_area + voltageVec.at(j) / 1000.0;
+    }
+
+    pulse_area = pulse_area * time_difference / 1.0E12;
+
+    return pulse_area; // collected pulse area, assuming voltage is in volts, time
+    // is in seconds
+}
+/*==============================================================================
 Finding the undershoot area of a signal. Stop when it crosses zero
   std::vector<double> voltageVec := waveform
   std::vector<double> timeVec := time trace of the waveform
@@ -219,6 +353,60 @@ double WaveformAnalysis::Find_Udershoot_Area(
     // volts, time is in seconds
 }
 
+/*==============================================================================
+Finding the undershoot area of a signal. Stop when it crosses zero
+  std::vector<float> voltageVec := waveform
+  std::vector<float> timeVec := time trace of the waveform
+  const std::pair<float,unsigned int> Pmax := tuple that contains pmax and its
+index
+
+  return: (float) value of the pulse area
+  Overloaded for floats
+==============================================================================*/
+float WaveformAnalysis::Find_Udershoot_Area(
+    const std::vector<float> &voltageVec,
+    const std::vector<float> &timeVec,
+    const std::pair<float, unsigned int> &Pmax
+)
+{
+    float undershoot_area = 0.0;
+    const float time_difference = timeVec.at(1) - timeVec.at(0);
+
+    const unsigned int imax = Pmax.second;
+    unsigned int istart = 0;
+    unsigned int iend;
+    std::size_t npoints = voltageVec.size();
+
+    for (unsigned int j = imax; j < npoints;j++)   // find index of start of pulse
+    {
+        if (voltageVec.at(j) <= 0)   // stop after crossing zero
+        {
+            istart = j;
+            break;
+        }
+    }
+    for (unsigned int j = istart; j < npoints; j++)   // find index of end of pulse
+    {
+        if (voltageVec.at(j) >= 0)
+        {
+            iend = j;
+            break;
+        }
+        if (j == npoints - 1)
+        {
+            iend = j;
+        }
+    }
+    for (unsigned int j = istart; j < iend; j++)
+    {
+        undershoot_area = undershoot_area + voltageVec.at(j) / 1000.0;
+    }
+
+    undershoot_area = undershoot_area * time_difference / 1.0E12;
+
+    return undershoot_area; // collected undershoot area, assuming voltage is in
+    // volts, time is in seconds
+}
 /*==============================================================================
 Finding the undershoot area of a signal with extended time window.
   std::vector<double> voltageVec := waveform

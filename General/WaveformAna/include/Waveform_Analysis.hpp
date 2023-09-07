@@ -81,6 +81,11 @@ public:
         const double &fractional_pts
     );
 
+    float Correct_Baseline2(
+        std::vector<float> &voltageVec,
+        const float &fractional_pts
+    );
+
     double Correct_Baseline3(
         std::vector<double> &voltageVec,
         const std::vector<double> &timeVec,
@@ -115,12 +120,28 @@ public:
         const double searchRange[2]
     );
 
+    std::pair<float, unsigned int>
+    static Find_Signal_Maximum(
+        const std::vector<float> &VoltageVec,
+	const std::vector<float> &timeVec,
+	const bool &confineSearchRegion,
+	const float searchRange[2]
+    );
+
     std::pair<double, unsigned int>
     Find_Negative_Signal_Maximum(
         const std::vector<double> &voltageVec,
         const std::vector<double> &timeVec,
         const bool &confineSearchRegion,
         const double searchRange[2]
+    );
+
+    std::pair<float, unsigned int>
+    Find_Negative_Signal_Maximum(
+        const std::vector<float> &voltageVec,
+        const std::vector<float> &timeVec,
+        const bool &confineSearchRegion,
+        const float searchRange[2]
     );
 
     double Get_Tmax(
@@ -165,6 +186,12 @@ public:
         const std::pair<double, unsigned int> &Pmax
     );
 
+    float Find_Pulse_Area(
+        const std::vector<float> &voltageVec,
+        const std::vector<float> &timeVec,
+        const std::pair<float, unsigned int> &Pmax
+    );
+
     double Find_Pulse_Area(
         const std::vector<double> &voltageVec,
         const std::vector<double> &timeVec,
@@ -172,11 +199,25 @@ public:
         const double &artificial_baseline
     );
 
+    float Find_Pulse_Area(
+        const std::vector<float> &voltageVec,
+        const std::vector<float> &timeVec,
+        const std::pair<float, unsigned int> &Pmax,
+        const float &artificial_baseline
+    );
+
     double Find_Udershoot_Area(
         const std::vector<double> &voltageVec,
         const std::vector<double> &timeVec,
         const std::pair<double, unsigned int> &Pmax
     );
+
+    float Find_Udershoot_Area(
+        const std::vector<float> &voltageVec,
+        const std::vector<float> &timeVec,
+        const std::pair<float, unsigned int> &Pmax
+    );
+
 
     double Find_Udershoot_Area(
         const std::vector<double> &voltageVec,
@@ -232,7 +273,7 @@ public:
     );
 
     //==========================================================================
-    // Rise Time
+    // Rise and Fall Time
     double Find_Rise_Time(
         const std::vector<double> &voltageVec,
         const std::vector<double> &timeVec,
@@ -241,6 +282,27 @@ public:
         const double &top = 0.9
     );
 
+    float Find_Rise_Time(
+        const std::vector<float> &voltageVec,
+        const std::vector<float> &timeVec,
+        const std::pair<float, unsigned int> &Pmax,
+        const float &bottom = 0.1,
+        const float &top = 0.9
+    );
+
+    float Find_Fall_Time(
+        const std::vector<float> &voltageVec,
+        const std::vector<float> &timeVec,
+        const std::pair<float, unsigned int> &Pmax,
+        const float &top = 0.9,
+        const float &bottom = 0.1
+    );
+
+    float Find_FWHM(
+        const std::vector<float> &voltageVec,
+        const std::vector<float> &timeVec,
+        const std::pair<float, unsigned int> &Pmax
+    );
     //==========================================================================
     // Noise
     double Find_Noise(

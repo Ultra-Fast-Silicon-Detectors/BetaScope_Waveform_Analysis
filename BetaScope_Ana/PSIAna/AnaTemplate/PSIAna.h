@@ -33,7 +33,7 @@ public:
               else if (underscore.compare(ifile.substr(i+11,1))==0){
                   run_number=ifile.substr(i+8,3);
               }
-          }
+	  }
       }
   };
 
@@ -63,13 +63,24 @@ public:
   double *tmax_ps[16];
   double *tmaxGlobal[16];
   double *tmaxGlobal_ps[16];
+  double *pmaxOutOfTime[16];
+  double *tmaxOutOfTime[16];
+  double *tmaxOutOfTime_ps[16];
   int *max_indexing[16];
   int *max_indexing_global[16];
+  int *Event;
 
   double *pulseArea[16];
   double *negPmax[16];
+  double *negPmaxGlobal[16];
   double *negTmax[16];
   double *negTmax_ps[16];
+  double *negTmaxGlobal[16];
+  double *negTmaxGlobal_ps[16];
+  double *negPmaxOutOfTime[16];
+  double *negTmaxOutOfTime[16];
+  double *negTmaxOutOfTime_ps[16];
+
 
   // example of filling standalone histograms
   //TH1D standAloneHisto = TH1D("standAloneHisto", "standAloneHisto", 100, 1, 1);

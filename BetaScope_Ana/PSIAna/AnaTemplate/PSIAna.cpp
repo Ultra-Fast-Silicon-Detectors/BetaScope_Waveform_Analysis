@@ -14,10 +14,12 @@
 #include <thread>
 //---------------
 
-void loopHelper(WaveformAnalysis *WaveAna, std::vector<double>  *w, std::vector<double> *t, double *pmax, double *pmaxGlobal, double *tmax, double *tmax_ps, double *tmaxGlobal, double *tmaxGlobal_ps, int *max_indexing, int *max_indexing_global, double *negPmax, double *negTmax, double *negTmax_ps, double *pulseArea, double assistThreshold, std::string run_number, int channel) {
+void loopHelper(WaveformAnalysis *WaveAna, std::vector<double>  *w, std::vector<double> *t, double *pmax, double *pmaxGlobal, double *tmax, double *tmax_ps, double *tmaxGlobal, double *tmaxGlobal_ps, 
+    int *max_indexing, int *max_indexing_global, double *negPmax, double *negPmaxGlobal, double *negTmax, double *negTmax_ps, double *negTmaxGlobal, double *negTmaxGlobal_ps, double *pulseArea, double *pmaxOutOfTime, 
+    double *tmaxOutOfTime, double *tmaxOutOfTime_ps, double *negPmaxOutOfTime, double *negTmaxOutOfTime, double *negTmaxOutOfTime_ps, double assistThreshold, std::string run_number, int channel) {
   WaveAna->Correct_Baseline2(*w, 0.30);
 
-  std::string fname("/home/psi_tb/Desktop/HGTD_BetaScope_FW_Test/BetaScope_Ana/PSIAna/AnaTemplate/test.csv");
+  std::string fname("/home/psi_tb/Desktop/HGTD_BetaScope_FW_Test/BetaScope_Ana/PSIAna/AnaTemplate/PSIRuns.csv");
   csv_run_reader run_map(fname);
 
   //Ints correspond to the columns of the CSV file the description correspond to which column does the described knowledge live
@@ -35,6 +37,10 @@ void loopHelper(WaveformAnalysis *WaveAna, std::vector<double>  *w, std::vector<
   double unitsToPs = 400.0;
   double nsToUnits = 1000.0/400.0;
 
+  double unitsStartTime = 0;
+  double unitsNegPmaxEndTime = 900;
+  double unitsEndTime = 1024;
+
   if (channel == run_map.run_selections(run_number)[trig_channel_id]){
       searchrange[0]=run_map.run_selections(run_number)[channel_trig_min_id]*nsToUnits;
       searchrange[1]=run_map.run_selections(run_number)[channel_trig_max_id]*nsToUnits;
@@ -47,7 +53,12 @@ void loopHelper(WaveformAnalysis *WaveAna, std::vector<double>  *w, std::vector<
       searchrange[0]=(run_map.run_selections(run_number)[channelx_min_id])*nsToUnits;
       searchrange[1]=(run_map.run_selections(run_number)[channelx_max_id])*nsToUnits;
   }
- 
+
+
+
+  double windowLowerEnd = searchrange[0];
+  double windowUpperEnd = searchrange[1];
+
   std::pair<double, unsigned int> pmax_pair = WaveAna->Find_Signal_Maximum(*w, *t, 1, searchrange);
   *pmax = pmax_pair.first;
   *tmax = t->at(pmax_pair.second);
@@ -60,12 +71,53 @@ void loopHelper(WaveformAnalysis *WaveAna, std::vector<double>  *w, std::vector<
   *tmaxGlobal_ps = *tmaxGlobal*unitsToPs;
   *max_indexing_global = pmax_pair_global.second;
 
+  double beforeWindowSearchRange[2] = {unitsStartTime,windowLowerEnd};
+  double afterWindowSearchRange[2] = {windowUpperEnd,unitsEndTime};
 
-  //neg pmax/tmax still global
-  std::pair<double, unsigned int> negPmax_pair = WaveAna->Find_Negative_Signal_Maximum(*w, *t, 0, 0);
+  std::pair<double, unsigned int> pmax_pair_before_window = WaveAna->Find_Signal_Maximum(*w, *t, 1, beforeWindowSearchRange);
+  std::pair<double, unsigned int> pmax_pair_after_window = WaveAna->Find_Signal_Maximum(*w, *t, 1, afterWindowSearchRange);
+
+  if (pmax_pair_before_window.first>=pmax_pair_after_window.first){
+      *pmaxOutOfTime = pmax_pair_before_window.first;
+      *tmaxOutOfTime = t->at(pmax_pair_before_window.second);
+      *tmaxOutOfTime_ps = *tmaxOutOfTime*unitsToPs;
+  }
+  else {
+      *pmaxOutOfTime = pmax_pair_after_window.first;
+      *tmaxOutOfTime = t->at(pmax_pair_after_window.second);
+      *tmaxOutOfTime_ps = *tmaxOutOfTime*unitsToPs;
+  }
+
+ 
+
+//neg pmax and tmax
+
+  std::pair<double, unsigned int> negPmax_pair = WaveAna->Find_Negative_Signal_Maximum(*w, *t, 1, searchrange);
   *negPmax = negPmax_pair.first;
   *negTmax = t->at(negPmax_pair.second);
   *negTmax_ps = *negTmax*unitsToPs;
+
+  std::pair<double, unsigned int> negPmax_pair_global = WaveAna->Find_Negative_Signal_Maximum(*w, *t, 0, 0);
+  *negPmaxGlobal = negPmax_pair_global.first;
+  *negTmaxGlobal = t->at(negPmax_pair_global.second);
+  *negTmaxGlobal_ps = *negTmaxGlobal*unitsToPs;
+
+  double negAfterWindowSearchRange[2] = {windowUpperEnd,unitsNegPmaxEndTime};
+
+  std::pair<double, unsigned int> negPmax_pair_before_window = WaveAna->Find_Negative_Signal_Maximum(*w, *t, 1, beforeWindowSearchRange);
+  std::pair<double, unsigned int> negPmax_pair_after_window = WaveAna->Find_Negative_Signal_Maximum(*w, *t, 1, negAfterWindowSearchRange);
+
+  if (negPmax_pair_before_window.first<=negPmax_pair_after_window.first){
+      *negPmaxOutOfTime = negPmax_pair_before_window.first;
+      *negTmaxOutOfTime = t->at(negPmax_pair_before_window.second);
+      *negTmaxOutOfTime_ps = *negTmaxOutOfTime*unitsToPs;
+  }
+  else {
+      *negPmaxOutOfTime = negPmax_pair_after_window.first;
+      *negTmaxOutOfTime = t->at(negPmax_pair_after_window.second);
+      *negTmaxOutOfTime_ps = *negTmaxOutOfTime*unitsToPs;
+  }
+// other
 
   *pulseArea = WaveAna->Find_Pulse_Area(*w, *t, pmax_pair);
 
@@ -103,10 +155,12 @@ void PSIAna::Initialize() {
       t_ps = this->beta_scope.GetOutBranch<std::vector<double>>("time_ps");
       br_check = this->beta_scope.BuildOutBranch<std::vector<double>>("timeTrigger_ps");
       tTrigger_ps = this->beta_scope.GetOutBranch<std::vector<double>>("timeTrigger_ps");
+      br_check = this->beta_scope.BuildOutBranch<int>("event");
+      this->Event = this->beta_scope.GetOutBranch<int>("event");
 
        }
   }
-
+  
   for (int i = 0; i < 16; i++) {
     auto br_check = this->beta_scope.BuildBranch<double>(Form("pmax%i", i));
     br_check = this->beta_scope.BuildBranch<double>(Form("pmaxGlobal%i", i));
@@ -118,9 +172,17 @@ void PSIAna::Initialize() {
     br_check = this->beta_scope.BuildOutBranch<int>(Form("max_indexing_global%i", i));
     br_check = this->beta_scope.BuildOutBranch<double>(Form("pulseArea%i", i));
     br_check = this->beta_scope.BuildOutBranch<double>(Form("negPmax%i", i));
+    br_check = this->beta_scope.BuildOutBranch<double>(Form("negPmaxGlobal%i", i));
     br_check = this->beta_scope.BuildOutBranch<double>(Form("negTmax%i", i));
     br_check = this->beta_scope.BuildOutBranch<double>(Form("negTmax_ps%i", i));
-
+    br_check = this->beta_scope.BuildOutBranch<double>(Form("negTmaxGlobal%i", i));
+    br_check = this->beta_scope.BuildOutBranch<double>(Form("negTmaxGlobal_ps%i", i));
+    br_check = this->beta_scope.BuildOutBranch<double>(Form("pmaxOutOfTime%i", i));
+    br_check = this->beta_scope.BuildOutBranch<double>(Form("tmaxOutOfTime%i", i));
+    br_check = this->beta_scope.BuildOutBranch<double>(Form("tmaxOutOfTime_ps%i", i));
+    br_check = this->beta_scope.BuildOutBranch<double>(Form("negPmaxOutOfTime%i", i));
+    br_check = this->beta_scope.BuildOutBranch<double>(Form("negTmaxOutOfTime%i", i));
+    br_check = this->beta_scope.BuildOutBranch<double>(Form("negTmaxOutOfTime_ps%i", i));
     this->pmax[i] = this->beta_scope.GetOutBranch<double>(Form("pmax%i", i));
     this->pmaxGlobal[i] = this->beta_scope.GetOutBranch<double>(Form("pmaxGlobal%i", i));
     this->tmax[i] = this->beta_scope.GetOutBranch<double>(Form("tmax%i", i));
@@ -131,8 +193,18 @@ void PSIAna::Initialize() {
     this->max_indexing_global[i] = this->beta_scope.GetOutBranch<int>(Form("max_indexing_global%i", i));
     this->pulseArea[i] = this->beta_scope.GetOutBranch<double>(Form("pulseArea%i", i));
     this->negPmax[i] = this->beta_scope.GetOutBranch<double>(Form("negPmax%i", i));
+    this->negPmaxGlobal[i] = this->beta_scope.GetOutBranch<double>(Form("negPmaxGlobal%i", i));
     this->negTmax[i] = this->beta_scope.GetOutBranch<double>(Form("negTmax%i", i));
     this->negTmax_ps[i] = this->beta_scope.GetOutBranch<double>(Form("negTmax_ps%i", i));
+    this->negTmaxGlobal[i] = this->beta_scope.GetOutBranch<double>(Form("negTmaxGlobal%i", i));
+    this->negTmaxGlobal_ps[i] = this->beta_scope.GetOutBranch<double>(Form("negTmaxGlobal_ps%i", i));
+    this->pmaxOutOfTime[i] = this->beta_scope.GetOutBranch<double>(Form("pmaxOutOfTime%i", i));
+    this->tmaxOutOfTime[i] = this->beta_scope.GetOutBranch<double>(Form("tmaxOutOfTime%i", i));
+    this->tmaxOutOfTime_ps[i] = this->beta_scope.GetOutBranch<double>(Form("tmaxOutOfTime_ps%i", i));
+    this->negPmaxOutOfTime[i] = this->beta_scope.GetOutBranch<double>(Form("negPmaxOutOfTime%i", i));
+    this->negTmaxOutOfTime[i] = this->beta_scope.GetOutBranch<double>(Form("negTmaxOutOfTime%i", i));
+    this->negTmaxOutOfTime_ps[i] = this->beta_scope.GetOutBranch<double>(Form("negTmaxOutOfTime_ps%i", i));
+
   }
 }
 
@@ -143,9 +215,9 @@ void PSIAna::Initialize() {
 void PSIAna::LoopEvents() {
   // double *d = this->beta_scope.get<double>("ws0", "vector<double?");
   int count = 0;
-
+  
   //this is temporary until a better solution is implemented
-  std::string fname("/home/psi_tb/Desktop/HGTD_BetaScope_FW_Test/BetaScope_Ana/PSIAna/AnaTemplate/test.csv");
+  std::string fname("/home/psi_tb/Desktop/HGTD_BetaScope_FW_Test/BetaScope_Ana/PSIAna/AnaTemplate/PSIRuns.csv");
   csv_run_reader run_map(fname);
   int trigger_channel_delay_id = 9;
   double triggerTimeDelay = run_map.run_selections(run_number)[trigger_channel_delay_id];
@@ -230,18 +302,21 @@ void PSIAna::LoopEvents() {
 
     WaveformAnalysis *WaveAna_ptr = &WaveAna;
     std::vector<std::thread *> workers;
+
     for (int channel  = 0; channel < 16; channel++) {
       workers.push_back(new std::thread(
           loopHelper, WaveAna_ptr, this->w[channel], this->t, this->pmax[channel], this->pmaxGlobal[channel],
-          this->tmax[channel], this->tmax_ps[channel], this->tmaxGlobal[channel], this->tmaxGlobal_ps[channel], this->max_indexing[channel], this->max_indexing_global[channel], this->negPmax[channel],
-          this->negTmax[channel], this->negTmax_ps[channel], this->pulseArea[channel], assistThreshold, this->run_number, channel));
+          this->tmax[channel], this->tmax_ps[channel], this->tmaxGlobal[channel], this->tmaxGlobal_ps[channel], this->max_indexing[channel], this->max_indexing_global[channel], this->negPmax[channel], this->negPmaxGlobal[channel],
+          this->negTmax[channel], this->negTmax_ps[channel], this->negTmaxGlobal[channel], this->negTmaxGlobal_ps[channel], this->pulseArea[channel], this->pmaxOutOfTime[channel], this->tmaxOutOfTime[channel], 
+	  this->tmaxOutOfTime_ps[channel], this->negPmaxOutOfTime[channel], this->negTmaxOutOfTime[channel], this->negTmaxOutOfTime_ps[channel], assistThreshold, this->run_number, channel));
     }
 
     for (std::size_t id = 0; id < workers.size(); id++) {
       workers[id]->join();
       delete workers[id];
     }
-
+    *Event = count;
+    
     count++;
 
     BetaScope_AnaFramework::FillData();

@@ -33,7 +33,15 @@ class csv_run_reader{
         }
         
         std::vector<float> run_selections(std::string run_name){
-            return m_run_map[run_name];
+	    //If there is no csv entry for the run_name pick the default value which is run number "-1"
+	    if (m_run_map.find(run_name) == m_run_map.end()){
+		std::cout<<"Warning: I have no entry in the csv file for this root file"<<std::endl;
+		std::string no_entry_handling = "-1";
+                return m_run_map[no_entry_handling]; 
+	    }
+	    else{
+		return m_run_map[run_name];
+	    }
         }
         
         std::vector<std::string> get_header(){
@@ -63,7 +71,7 @@ class csv_run_reader{
 //  
 //  // Run is a string, returns a vector of floats as in the file. Argument 0 is the run number as number
 //  // it's a map, so no need to have the right order on the csv
-//    std::cout<<run_map.run_selections("121")[0]<<" "<<run_map.run_selections("121")[1]<<run_map.run_selections("121")[2]<<run_map.run_selections("121")[3]<<std::endl;
+//    std::cout<<run_map.run_selections("131")[0]<<" "<<run_map.run_selections("131")[1]<<run_map.run_selections("131")[2]<<run_map.run_selections("131")[3]<<std::endl;
 //  
 //    return 0;
 //}

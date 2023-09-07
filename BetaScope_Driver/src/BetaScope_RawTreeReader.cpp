@@ -21,15 +21,15 @@ bool BetaScope::RawTreeReader(const char *itreeName) {
   LOG_INFO( this->input_file_nick_name_ + ", found number of events: " + std::to_string(this->input_num_event_));
   LOG_INFO("Looping through raw scope channels.");
 
-  for( int b = 1, max = 5; b < max; b++)
-  {
-    if(BetaScope::IsBranchExists(Form("t%i", b)))
-    {
-      BetaScope::SetInBranch<TTreeReaderArray, double>( Form("w%i", b), Form("w%i", b));
-      BetaScope::SetInBranch<TTreeReaderArray, double>( Form("t%i", b), Form("t%i", b));
-      this->channel.push_back(b);
-    }
-  }
+  //for( int b = 1, max = 5; b < max; b++)
+  //{
+  //  if(BetaScope::IsBranchExists(Form("t%i", b)))
+  //  {
+  //    BetaScope::SetInBranch<TTreeReaderArray, double>( Form("w%i", b), Form("w%i", b));
+  //    BetaScope::SetInBranch<TTreeReaderArray, double>( Form("t%i", b), Form("t%i", b));
+  //    this->channel.push_back(b);
+  //  }
+  //}
 
   LOG_INFO("Finished, exiting");
 

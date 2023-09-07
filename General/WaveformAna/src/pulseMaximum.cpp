@@ -86,6 +86,71 @@ WaveformAnalysis::Find_Signal_Maximum(
     return std::make_pair(pmax, pmaxIndex);
 }
 
+//==============================================================================
+
+/*==============================================================================
+Finding the Signal Maximum (Pmax)
+  param voltageVec := waveform
+  param timeVect   := time trace of the waveform
+  param confineSearchRegion := turn ON of OFF the search region.
+  param searchRage := the range for the Pmax search
+
+  return : Pmax value and its index in the waveform vector.
+  Overloading this function to return and deal with floats
+==============================================================================*/
+std::pair<float, unsigned int>
+WaveformAnalysis::Find_Signal_Maximum(
+    const std::vector<float> &voltageVec,
+    const std::vector<float> &timeVec,
+    const bool &confineSearchRegion,
+    const float searchRange[2]
+)
+{
+    float pmax = 0.0;
+    unsigned int pmaxIndex = 0;
+    // bool   strangePeak = true;
+    bool firstPoint = true;
+    std::size_t npoints = voltageVec.size();
+
+    if (confineSearchRegion)
+    {
+        for (std::size_t j = 0; j < npoints; j++)
+        {
+            if (searchRange[0] <= timeVec.at(j) && timeVec.at(j) <= searchRange[1])   // zoom in to find the Pmax
+            {
+                if (firstPoint)
+                {
+                    pmaxIndex = j;
+                    firstPoint = false;
+                }
+                if (voltageVec.at(j) > pmax)
+                {
+                    pmax = voltageVec.at(j);
+                    pmaxIndex = j;
+                }
+            }
+        }
+    }
+    else
+    {
+        for (std::size_t j = 0; j < npoints; j++)
+        {
+            if (j == 0)
+            {
+                pmax = voltageVec[j];
+                pmaxIndex = j;
+            }
+            if (j != 0 && voltageVec.at(j) > pmax)
+            {
+                pmax = voltageVec.at(j);
+                pmaxIndex = j;
+            }
+        }
+    }
+
+    return std::make_pair(pmax, pmaxIndex);
+}
+
 /*==============================================================================
 Find the negative signal maximum (indeed the signal minimum)
   param voltageVec := waveform (stl vector)
@@ -106,6 +171,71 @@ WaveformAnalysis::Find_Negative_Signal_Maximum(
     std::string function_name = "WaveformAnalysis::Find_Negative_Signal_Maximum";
 
     double pmax = 0.0;
+    unsigned int pmaxIndex = 0;
+    // bool strangePeak = true;
+    bool firstPoint = true;
+    std::size_t npoints = voltageVec.size();
+
+    if (confineSearchRegion)
+    {
+        for (std::size_t j = 0; j < npoints; j++)
+        {
+            if (searchRange[0] <= timeVec.at(j) && timeVec.at(j) <= searchRange[1])   // zoom in to find the Pmax
+            {
+                if (firstPoint)
+                {
+                    pmaxIndex = j;
+                    firstPoint = false;
+                }
+                if (voltageVec.at(j) < pmax)
+                {
+                    pmax = voltageVec.at(j);
+                    pmaxIndex = j;
+                }
+            }
+        }
+    }
+    else
+    {
+        for (std::size_t j = 0, max = npoints; j < max; j++)
+        {
+            if (j == 0)
+            {
+              pmax = voltageVec.at(j);
+              pmaxIndex = j;
+            }
+            if (j != 0 && voltageVec.at(j) < pmax)
+            {
+                pmax = voltageVec.at(j);
+                pmaxIndex = j;
+            }
+        }
+    }
+
+    return std::make_pair(pmax, pmaxIndex);
+}
+
+/*==============================================================================
+Find the negative signal maximum (indeed the signal minimum)
+  param voltageVec := waveform (stl vector)
+  param timeVec    := time trace of the waveform
+  param confineSearchRegion := turn ON of OFF the search region.
+  param searchRage := the range for the Pmax search
+
+  return : Negative Pmax value and its index in the waveform vector.
+  Overloading this function to return and deal with floats
+==============================================================================*/
+std::pair<float, unsigned int>
+WaveformAnalysis::Find_Negative_Signal_Maximum(
+    const std::vector<float> &voltageVec,
+    const std::vector<float> &timeVec,
+    const bool &confineSearchRegion,
+    const float searchRange[2]
+)
+{
+    std::string function_name = "WaveformAnalysis::Find_Negative_Signal_Maximum";
+
+    float pmax = 0.0;
     unsigned int pmaxIndex = 0;
     // bool strangePeak = true;
     bool firstPoint = true;
